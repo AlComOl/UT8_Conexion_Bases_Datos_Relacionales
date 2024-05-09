@@ -5,6 +5,8 @@ import java.sql.*;
  * 
  * @fecha 03/05/2024
  * 
+ *esta mal tengo que crear un fichero con los datos y meterlos en la base de datos
+ * 
  *************************************************/
 public class Prg_1 {
 

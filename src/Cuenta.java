@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -17,7 +18,7 @@ public class Cuenta {
 	                    
 //	                    cargaCuenta(con);
 	                    
-	                    transaccion(con,"jugadores",2,1,100);
+	                    transaccion(con,"jugadores",1,2,500);
 
 	                    
 		}catch (SQLException e){
@@ -78,18 +79,35 @@ public class Cuenta {
 	
 	
 	public static void transaccion(Connection con, String BDNombre,int cuentaA, int cuentaB, int cantidad) throws SQLException{
+		
+		String compruebaCuentaA="SELECT saldo FROM " + BDNombre + ".Cuenta WHERE numeroCuenta = " +cuentaA;
+				
 		String actualizaA= "UPDATE "+BDNombre+ ".Cuenta "+
                 "SET SALDO = SALDO - "+cantidad+" where numeroCuenta = "+cuentaA;
 		String actualizaB="UPDATE "+BDNombre+ ".Cuenta "+
                "SET SALDO = SALDO + "+cantidad+" where numeroCuenta = "+cuentaB;
-		Statement stmt =null;
+		Statement stmt =con.createStatement();
 		
 		try{
+			
+			
+			ResultSet rs=stmt.executeQuery(compruebaCuentaA);//Resulset tiene el metodo para ejecutar la consulta
+			
+			rs.next();//el next lo que hace es pasar consulta por consulta 
+			
+			int saldo=rs.getInt("saldo");//mete la consulta de la etiqueta saldo
+			
+			if(saldo<cantidad) {
+				throw new IllegalArgumentException("Saldo insuficiente en la cuenta "+cuentaA);
+			}
+			
 		con.setAutoCommit(false);
 		stmt=con.createStatement();
+//		if(stmt.executeUpdate(actualizaA)==0)throw new SQLException();
+//		if(stmt.executeUpdate(actualizaB)==0)throw new SQLException();
 		stmt.executeUpdate (actualizaA);
 		stmt.executeUpdate (actualizaB);
-		
+	
 		}
 		catch (SQLException e){
 		e.printStackTrace();
